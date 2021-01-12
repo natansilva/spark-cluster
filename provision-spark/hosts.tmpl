@@ -1,0 +1,7 @@
+[spark-master]
+${spark_master_dns}
+
+[spark-node]
+%{ for dns in spark_node_dns ~}
+${dns}
+%{ endfor ~}
