@@ -3,5 +3,6 @@
 .terraform.lock.hcl
 *.tfvars
 
-## Created ansible hosts
+## Created ansible files
 provision-spark/hosts
+provision-spark/group_vars/all
