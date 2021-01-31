@@ -1,0 +1,42 @@
+- name: "Create group spark"
+  group:
+    name: "spark"
+    state: present
+
+- name: "Add user spark"
+  user:
+    name: "spark"
+    group: "spark"
+
+- name: Install Java and other packages
+  apt:
+    name: "{{ items }}"
+  with_items:
+    - default-jdk
+    - scala
+    - git
+    - python3-pip
+
+- name: Install specified python requirements
+  pip:
+    requirements: requirements.txt
+
+- name: "Download spark tar"
+  get_url:
+    url: "https://downloads.apache.org/spark/spark-3.0.1/spark-3.0.1-bin-hadoop2.7.tgz"
+    dest: "/tmp"
+
+- name: "Extract spark tar"
+  unarchive:
+    src: "/tmp/spark-3.0.1-bin-hadoop2.7.tgz"
+    dest: "/opt/spark"
+    remote_src: yes
+    owner: spark
+    group: spark
+
+- name: Set spark environment variables
+  shell: echo "export {{ item.var_name }}={{ item.var_value }}"
+  with_items:
+    - { var_name: SPARK_HOME, var_value: /opt/spark }
+    - { var_name: PATH, var_value: $PATH:$SPARK_HOME/bin:$SPARK_HOME/sbin }
+    - { var_name: PYSPARK_PYTHON, var_value: /usr/bin/python3 }

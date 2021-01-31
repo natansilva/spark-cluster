@@ -1,0 +1,12 @@
+---
+- hosts: all
+  roles:
+    - spark
+
+- hosts: spark-master
+  roles:
+    - spark-master
+
+- hosts: spark-node
+  roles:
+    - spark-node
