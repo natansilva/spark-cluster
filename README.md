@@ -14,7 +14,6 @@ This repository create a spark cluster on AWS or GCP using Terraform and Ansible
 
 
 ## USING ON GCP
->UNDER CONSTRUCTION
 1. Install [Goolge Cloud sdk](https://cloud.google.com/sdk/docs/install).
 2. Authentication with `gcloud auth application-default login`.
 3. Go to `provision-aws-instance` folder.

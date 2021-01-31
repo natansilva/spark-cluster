@@ -1,6 +1,6 @@
 provider "google" {
-  project     = "my-project-id"
-  region      = "us-central1"
+  project     = var.project_id
+  region      = var.region
 }
 
 resource "google_compute_instance" "spark-master" {
@@ -14,50 +14,52 @@ resource "google_compute_instance" "spark-master" {
   }
 
   network_interface {
-    network = "default"
+    network = google_compute_network.spark-network.name
 
     access_config {
-      // Ephemeral IP
     }
+  }
+
+  metadata = {
+    "ssh-keys" = "${var.ssh_username}:${file("~/.ssh/id_rsa.pub")}"
   }
 }
 
-resource "google_compute_instance" "spark-mode" {
+resource "google_compute_instance" "spark-node" {
   count = var.spark_n_nodes
   name = "spark-node-${format("%02d", count.index + 1)}"
   machine_type = var.gcp_instance_type
 
   boot_disk {
     initialize_params {
-      image = "debian-cloud/debian-9"
+      image = var.gcp_instance_image
     }
   }
 
   network_interface {
-    network = "default"
+    network = google_compute_network.spark-network.name
 
     access_config {
-      // Ephemeral IP
     }
   }
 }
 
 resource "local_file" "ansible-inventory" {
   content = templatefile(
-    "../provision-spark/hosts.tmpl",
+    "../provision-spark/templates/hosts.tmpl",
     {
-      "spark_master_dns": google_compute_instance.spark-master.public_dns,
-      "spark_node_dns": google_compute_instance.spark-node[*].public_dns
+      "spark_master_dns": google_compute_instance.spark-master.network_interface[0].access_config[0].nat_ip,
+      "spark_node_dns": google_compute_instance.spark-node[*].network_interface[0].access_config[0].nat_ip
     }
   )
   filename = "ansible/hosts"
 }
 
-resource "local_file" "ansible-inventory" {
+resource "local_file" "ansible-vars" {
   content = templatefile(
     "../provision-spark/templates/group_vars.tmpl",
     {
-      "spark_master_dns": google_compute_instance.spark-master.public_dns
+      "spark_master_dns": google_compute_instance.spark-master.network_interface[0].access_config[0].nat_ip
     }
   )
   filename = "../provision-spark/group_vars/all"
