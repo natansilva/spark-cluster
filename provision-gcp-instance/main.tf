@@ -46,9 +46,19 @@ resource "local_file" "ansible-inventory" {
   content = templatefile(
     "../provision-spark/hosts.tmpl",
     {
-      "spark_master_dns": aws_instance.spark-master.public_dns,
-      "spark_node_dns": aws_instance.spark-node[*].public_dns
+      "spark_master_dns": google_compute_instance.spark-master.public_dns,
+      "spark_node_dns": google_compute_instance.spark-node[*].public_dns
     }
   )
   filename = "ansible/hosts"
+}
+
+resource "local_file" "ansible-inventory" {
+  content = templatefile(
+    "../provision-spark/templates/group_vars.tmpl",
+    {
+      "spark_master_dns": google_compute_instance.spark-master.public_dns
+    }
+  )
+  filename = "../provision-spark/group_vars/all"
 }
