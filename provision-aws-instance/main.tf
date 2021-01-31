@@ -44,7 +44,7 @@ resource "local_file" "ansible-inventory" {
   filename = "../provision-spark/hosts"
 }
 
-resource "local_file" "ansible-inventory" {
+resource "local_file" "ansible-vars" {
   content = templatefile(
     "../provision-spark/templates/group_vars.tmpl",
     {
