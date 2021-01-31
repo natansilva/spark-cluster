@@ -28,7 +28,7 @@ resource "aws_instance" "spark-node" {
   instance_type = var.aws_instance_type
   key_name = var.aws_ssh_key_name
   tags = {
-    "Name" = "spark-node-" + format("%02d", count.index + 1)
+    "Name" = "spark-node-${format("%02d", count.index + 1)}"
   }
   
 }
@@ -41,7 +41,7 @@ resource "local_file" "ansible-inventory" {
       "spark_node_dns": aws_instance.spark-node[*].public_dns
     }
   )
-  filename = "ansible/hosts"
+  filename = "../provision-spark/hosts"
 }
 
 
