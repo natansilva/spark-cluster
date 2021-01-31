@@ -1,0 +1,7 @@
+## Terraform 
+.terraform/
+.terraform.lock.hcl
+*.tfvars
+
+## Created ansible hosts
+provision-spark/hosts
